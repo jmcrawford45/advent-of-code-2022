@@ -1,14 +1,17 @@
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from utils import *
-from collections import *
-
 TEST_INPUT = """
-TODO
-"""
+199
+200
+208
+210
+200
+207
+240
+269
+260
+263"""
 
 PART_1_ANSWER = 0
 PART_2_ANSWER = 0
@@ -19,12 +22,20 @@ def parse_input(input: str) -> str:
 
 
 def part1(input: str) -> int:
-    result = 0
-    return result
+    m = [int(c) for c in input.splitlines()]
+    count = 0
+    for i in range(len(m) - 1):
+        if m[i+1] > m[i]:
+            count += 1 
+    return count
 
 def part2(input: str) -> int:
-    result = 0
-    return result
+    m = [int(c) for c in input.splitlines()]
+    count = 0
+    for i in range(2, len(m) - 2):
+        if sum(m[i:i+3]) > sum(m[i-1:i+2]):
+            count += 1
+    return count + 1
 
 
 input = parse_input(sys.stdin.read())

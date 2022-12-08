@@ -58,8 +58,6 @@ def traverse(tree: int, trees: list[list[int]], point: tuple[int, int], offset: 
         row, col  = point
         if not (0 <= row < len(trees)) or not (0 <= col < len(trees[0])):
             break
-        if not (0 <= row < len(trees)) or not (0 <= col < len(trees[0])):
-            break
         if trees[point[0]][point[1]] >= tree:
             visible += 1
             break
