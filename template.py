@@ -19,12 +19,10 @@ def parse_input(input: str) -> str:
 
 
 def part1(input: str) -> int:
-    result = 0
-    return result
+    return 0
 
 def part2(input: str) -> int:
-    result = 0
-    return result
+    return 0
 
 
 input = parse_input(sys.stdin.read())
