@@ -1,6 +1,7 @@
 import os
 import sys
-
+from logging import *
+basicConfig(level=INFO)
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from utils import *
@@ -27,8 +28,8 @@ def part2(input: str) -> int:
 
 input = parse_input(sys.stdin.read())
 test_input = parse_input(TEST_INPUT)
-print("=" * 40)
-print("test 1:", part1(test_input))
-print("part 1:", part1(input))
-print("test 2:", part2(test_input))
-print("part 2:", part2(input))
+info("=" * 40)
+info(f"test 1: {part1(test_input)}")
+info(f"part 1: {part1(input)}")
+info(f"test 2: {part2(test_input)}")
+info(f"part 2: {part2(input)}")
