@@ -41,10 +41,8 @@ PART_1_ANSWER = 0
 PART_2_ANSWER = 0
 
 class Monkey:
-    def __init__(self, items: list[int] = None, op: Callable[int, int] = None, test: Callable[int, int] = None):
-        self.test = test
-        self.op = op
-        self.items = items
+    def __init__(self):
+        pass
     def __repr__(self):
         return f"Monkey({self.items=})"
 
@@ -52,29 +50,42 @@ class Monkey:
 def parse_input(input: str) -> list[Monkey]:
     monkeys = []
     monkey = None
+    condition = true_branch = false_branch = None
     for line in input.strip().splitlines():
+        line = line.strip()
         if not line:
             continue
-        line = line.strip()
         if line.startswith("Monkey"):
             if monkey:
+                monkey.test = lambda x, true_branch=true_branch, false_branch=false_branch, condition=condition: (true_branch if x % condition == 0 else false_branch)
                 monkeys.append(monkey)
             monkey = Monkey()
+            condition = true_branch = false_branch = None
         elif line.startswith("Starting"):
             items = [int(c) for c in line.split(':')[1].strip().split(", ")]
             monkey.items = items
         elif line.startswith("Operation"):
-            monkey.op = line
+            if line.endswith("* old"):
+                monkey.op = lambda x: (x ** 2)
+            elif '+' in line:
+                c = int(line.split()[-1])
+                monkey.op = lambda x, c=c: (x + c)
+            elif '*' in line:
+                c = int(line.split()[-1])
+                monkey.op = lambda x, c=c: (x * c)
+            else:
+                raise ValueError()
         elif line.startswith("Test"):
-            monkey.condition = int(line.split()[-1])
+            condition = int(line.split()[-1])
+            monkey.condition = condition
         elif line.startswith("If true"):
-            monkey.true_branch = int(line.split()[-1])
+            true_branch = int(line.split()[-1])
         elif line.startswith("If false"):
-            monkey.false_branch = int(line.split()[-1])
+            false_branch = int(line.split()[-1])
         else:
             raise ValueError("failed to parse")
     if monkey:
-        monkey.test = lambda x: true_branch if x % condition == 0 else false_branch
+        monkey.test = lambda x: (true_branch if x % condition == 0 else false_branch)
         monkeys.append(monkey)
     return monkeys
 
@@ -85,19 +96,10 @@ def part1(monkeys: list[Monkey]) -> int:
         for i, monkey in enumerate(monkeys):
             debug(f"monkey {i} has {len(monkey.items)} items")
             for item in monkey.items:
-                line = monkey.op
-                op = lambda x: x
-                if line.endswith("* old"):
-                    op = lambda x: x ** 2
-                elif '+' in line:
-                    op = lambda x: x + int(line.split()[-1])
-                elif '*' in line:
-                    op = lambda x: x * int(line.split()[-1])
-                
-                item = op(item) // 3
+                item = monkey.op(item) // 3
                 debug(f"worry after inspect: {item}")
                 inspects[i] += 1
-                throw_to = monkey.true_branch if item % monkey.condition == 0 else monkey.false_branch
+                throw_to = monkey.test(item)
                 debug(f"{i} throws to {throw_to}")
                 monkeys[throw_to].items.append(item)
             monkey.items = []
@@ -115,19 +117,10 @@ def part2(monkeys: list[Monkey]) -> int:
         for i, monkey in enumerate(monkeys):
             debug(f"monkey {i} has {len(monkey.items)} items")
             for item in monkey.items:
-                line = monkey.op
-                op = lambda x: x
-                if line.endswith("* old"):
-                    op = lambda x: x ** 2
-                elif '+' in line:
-                    op = lambda x: x + int(line.split()[-1])
-                elif '*' in line:
-                    op = lambda x: x * int(line.split()[-1])
-                
-                item = op(item) % gcd
+                item = monkey.op(item) % gcd
                 debug(f"worry after inspect: {item}")
                 inspects[i] += 1
-                throw_to = monkey.true_branch if item % monkey.condition == 0 else monkey.false_branch
+                throw_to = monkey.test(item)
                 debug(f"{i} throws to {throw_to}")
                 monkeys[throw_to].items.append(item)
             monkey.items = []
