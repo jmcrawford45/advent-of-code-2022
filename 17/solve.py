@@ -6,9 +6,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from utils import *
 from collections import *
-from functools import lru_cache
-from dataclasses import dataclass
-
 
 TEST_INPUT = """
 TODO
