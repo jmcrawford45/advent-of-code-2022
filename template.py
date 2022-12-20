@@ -9,6 +9,21 @@ from collections import *
 from functools import lru_cache
 from dataclasses import dataclass
 
+from functools import wraps
+import time
+
+
+def timeit(func):
+    @wraps(func)
+    def timeit_wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        debug(f'Function {func.__name__}{args} {kwargs} Took {total_time:.4f} seconds')
+        return result
+    return timeit_wrapper
+
 
 TEST_INPUT = """
 TODO
@@ -21,10 +36,11 @@ PART_2_ANSWER = 0
 def parse_input(input: str) -> str:
     return input.strip()
 
-
+@timeit
 def part1(input: str) -> int:
     return 0
 
+@timeit
 def part2(input: str) -> int:
     return 0
 
