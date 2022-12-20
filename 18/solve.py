@@ -61,9 +61,9 @@ def part1(input: list[list[int]]) -> int:
                 continue
             for offset in [-1, 1]:
                 for index in range(3):
-                    cube3 = deepcopy(cube1)
+                    cube3 = list(deepcopy(cube1))
                     cube3[index] += offset
-                    if cube3 == cube2:
+                    if tuple(cube3) == cube2:
                         exposed -= 2
     return exposed
 
