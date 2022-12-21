@@ -64,34 +64,35 @@ def parse_input(input: str) -> tuple[Node, dict[int, Node]]:
     curr = head.prev
     return (head, index)
 
+def insert_node_after_curr(curr: Node, node: Node):
+    # insert and remove old pointers
+    if curr != node:        
+        old_curr_next = curr.next
+        old_node_next = node.next
+        old_node_prev = node.prev
+        node.next = old_curr_next
+        node.prev = curr
+        curr.next = node
+        old_node_next.prev = old_node_prev
+        old_node_prev.next = old_node_next
+        old_curr_next.prev = node
+
+
 def iterate(index):
     for i in sorted(index):
         if i % 500 == 499:
             info("500 processed")
         debug_node = index[0]
         node = index[i]
-        to_move = node.val % len(index)
-        if node.val < 0:
-            to_move -= 1
+        # fencepost since removal happens before shift
+        to_move = node.val % (len(index) - 1)
         curr = node
         while to_move > 0:
             curr = curr.next
             to_move -= 1
 
         debug(f"{node} moves {node.val % len(index)} forward between {curr} and {curr.next}:")
-        # insert and remove old pointers
-        if curr != node:
-            old_curr_next = curr.next
-            old_curr_prev = curr.prev
-            old_node_next = node.next
-            old_node_prev = node.prev
-            node.next = old_curr_next
-            node.prev = curr
-            curr.next = node
-            old_node_next.prev = old_node_prev
-            old_node_prev.next = old_node_next
-            old_curr_next.prev = node
-            old_curr_prev.next
+        insert_node_after_curr(curr, node)
             
         out = []
         for _ in range(len(index)):
@@ -99,19 +100,7 @@ def iterate(index):
             debug_node = debug_node.next
         debug(' '.join(out))
 
-
-def solve(input, rounds: int = 1) -> int:
-    head, index = input
-    for round_num in range(rounds):
-        iterate(index)
-        out = []
-        debug_node = index[5]
-        for _ in range(len(index)):
-            out.append(str(debug_node.val))
-            debug_node = debug_node.next
-        info(f"After {round_num+1} round of mixing:")
-        info(', '.join(out))
-    curr = head
+def get_groovy(curr: Node) -> int:
     while curr.val != 0:
         curr = curr.next
     steps = 3000
@@ -122,6 +111,27 @@ def solve(input, rounds: int = 1) -> int:
             debug(f"add result {curr.val}")
             result += curr.val
     return result
+
+
+def solve(input, rounds: int = 1) -> int:
+    head, index = input
+    out = []
+    debug_node = head
+    for _ in range(len(index)):
+        out.append(str(debug_node.val))
+        debug_node = debug_node.next
+    info(f"Initial arrangement:")
+    info(', '.join(out))
+    for round_num in range(rounds):
+        iterate(index)
+        out = []
+        debug_node = index[5]
+        for _ in range(len(index)):
+            out.append(str(debug_node.val))
+            debug_node = debug_node.next
+        info(f"After {round_num+1} round of mixing:")
+        info(', '.join(out))
+    return get_groovy(head)
 
 
 @timeit
@@ -135,11 +145,14 @@ def part2(input: str) -> int:
         index[i].val *= 811589153
     return solve(input, 10)
 
-
-input = parse_input(sys.stdin.read())
+stdin = sys.stdin.read()
+input = parse_input(stdin)
 test_input = parse_input(TEST_INPUT)
 info("=" * 40)
 info(f"test 1: {part1(test_input)}")
-# info(f"part 1: {part1(input)}")
+info(f"part 1: {part1(input)}")
+# since inputs are mutable, re-parse for part 2
+input = parse_input(stdin)
+test_input = parse_input(TEST_INPUT)
 info(f"test 2: {part2(test_input)}")
-# info(f"part 2: {part2(input)}")
+info(f"part 2: {part2(input)}")
