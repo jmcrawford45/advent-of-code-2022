@@ -44,11 +44,13 @@ def part1(input: str) -> int:
 def part2(input: str) -> int:
     return 0
 
-
-input = parse_input(sys.stdin.read())
+stdin = sys.stdin.read()
+input = parse_input(stdin)
 test_input = parse_input(TEST_INPUT)
 info("=" * 40)
 info(f"test 1: {part1(test_input)}")
 # info(f"part 1: {part1(input)}")
+# input = parse_input(stdin)
+# test_input = parse_input(TEST_INPUT)
 # info(f"test 2: {part2(test_input)}")
 # info(f"part 2: {part2(input)}")
