@@ -1,7 +1,7 @@
 import os
 import sys
 from logging import *
-basicConfig(level=DEBUG)
+basicConfig(level=INFO)
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from utils import *
@@ -139,7 +139,6 @@ def parse_input(input: str) -> str:
                 for k, v in face_map.items():
                     if v == cycle[0]:
                         to_add[cycle[-1]] = k
-                # info(f"{cycle=}")
         face_map.update(to_add)
         for row, col in face_coords:
             for dir in list("LRUD"):
@@ -150,11 +149,16 @@ def parse_input(input: str) -> str:
                 row2,col2,dir2 = v
                 # cant have len 1 cycle
                 if (row, col) != (row2, col2):
-                    # cant have len 2 cycle
-                    if abs(row-row2) + abs(col-col2) != 1:
+                    # cant have len 2 cycle or len 3 with identical dirs 
+                    if abs(row-row2) + abs(col-col2) != 1 and dir != dir2:
+                        debug("possible mapping")
                         possible_mappings[k] = v
         break
+
     face_map.update(possible_mappings)
+    debug(faces)
+    for k, v in sorted(face_map.items()):
+        debug(f"{k}: {v}")
 
 
 
@@ -203,6 +207,25 @@ def _move(l: tuple[int], curr: int) -> int:
 def move(l: Iterable[int], curr: int) -> int:
     return _move(tuple(l), curr)
 
+transform_coords = {
+    ("L", "L"): lambda row, col, cube_len: (row, cube_len - 1),
+    ("L", "R"): lambda row, col, cube_len: (cube_len - row - 1, 0),
+    ("L", "D"): lambda row, col, cube_len: (0, row),
+    ("L", "U"): lambda row, col, cube_len: (cube_len - 1, cube_len - row - 1),
+    ("R", "L"): lambda row, col, cube_len: (cube_len - row - 1, cube_len - 1),
+    ("R", "R"): lambda row, col, cube_len: (row, 0),
+    ("R", "D"): lambda row, col, cube_len: (0, cube_len - row - 1),
+    ("R", "U"): lambda row, col, cube_len: (cube_len - 1, row),
+    ("U", "L"): lambda row, col, cube_len: (cube_len - col - 1, cube_len - 1),
+    ("U", "R"): lambda row, col, cube_len: (col, 0),
+    ("U", "D"): lambda row, col, cube_len: (0, cube_len - col - 1),
+    ("U", "U"): lambda row, col, cube_len: (cube_len - 1, col),
+    ("D", "L"): lambda row, col, cube_len: (col, cube_len - 1),
+    ("D", "R"): lambda row, col, cube_len: (cube_len - col - 1, 0),
+    ("D", "D"): lambda row, col, cube_len: (0, col),
+    ("D", "U"): lambda row, col, cube_len: (cube_len - 1, cube_len - col - 1),
+}
+
 def move2(position: tuple[int, int], input: Map, direction: str) -> tuple[int, int, str]:
     row, col = position
     off_left = direction == "L" and col % input.cube_len == 0
@@ -211,28 +234,7 @@ def move2(position: tuple[int, int], input: Map, direction: str) -> tuple[int, i
     off_down = direction == "D" and row % input.cube_len == input.cube_len - 1
     if off_left or off_right or off_up or off_down:
         face_row, face_col, dir = input.face_map[(row // input.cube_len, col // input.cube_len, direction)]
-        if off_left or off_right:
-            if dir in "LR":
-                row_offset = row % input.cube_len
-                col_offset = input.cube_len - 1 if direction == "L" else 0
-            else:
-                row_offset = input.cube_len - 1 if direction == "U" else 0
-                if set([dir, direction]) == set(list("LU")) or set([dir, direction]) == set(list("DR")):
-                    col_offset = input.cube_len - (row % input.cube_len) - 1
-                else:
-                    col_offset = (row % input.cube_len)
-        if off_up or off_down:
-            if dir in "UD":
-                debug(f"{face_row, face_col, dir, direction}")
-                row_offset = input.cube_len - 1 if direction == "U" else 0
-                col_offset = col % input.cube_len
-            else:
-                if set([dir, direction]) == set(list("LU")) or set([dir, direction]) == set(list("DR")):
-                    row_offset = input.cube_len - (col % input.cube_len) - 1
-                else:
-                    row_offset = col % input.cube_len
-                col_offset = input.cube_len - 1 if direction == "L" else 0
-            debug(f"{row_offset, col_offset}")
+        row_offset, col_offset = transform_coords[(direction, dir)](row % input.cube_len, col % input.cube_len, input.cube_len)
         if input.map[face_row * input.cube_len + row_offset][face_col * input.cube_len + col_offset] == "#":
             return (row, col, direction)
         return face_row * input.cube_len + row_offset, face_col * input.cube_len + col_offset, dir
@@ -304,7 +306,7 @@ def part2(input: str) -> int:
 test_input = parse_input(TEST_INPUT)
 input = parse_input(sys.stdin.read())
 info("=" * 40)
-# info(f"test 1: {part1(test_input)}")
-# info(f"part 1: {part1(input)}")
+info(f"test 1: {part1(test_input)}")
+info(f"part 1: {part1(input)}")
 info(f"test 2: {part2(test_input)}")
-# info(f"part 2: {part2(input)}")
+info(f"part 2: {part2(input)}")
