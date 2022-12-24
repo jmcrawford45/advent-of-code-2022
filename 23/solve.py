@@ -1,7 +1,7 @@
 import os
 import sys
 from logging import *
-basicConfig(level=DEBUG)
+basicConfig(level=INFO)
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from utils import *
@@ -34,20 +34,6 @@ TEST_INPUT = """
 ##.#.##
 .#..#.."""
 
-
-"""
-.......#......
-.....#...#....
-...#..#.#.....
-.......#..#...
-....#.#.##....
-..#..#.#......
-..#.#.#.##....
-..............
-....#..#......"""
-
-PART_1_ANSWER = 110
-PART_2_ANSWER = 0
 from copy import deepcopy
 
 
@@ -148,16 +134,16 @@ def part2(input: str) -> int:
         draw(elves)
         debug(f"End of round {round + 1}")
         if not moved:
-            return round
+            return round + 1
         round += 1
 
 stdin = sys.stdin.read()
-# input = parse_input(stdin)
-# test_input = parse_input(TEST_INPUT)
+input = parse_input(stdin)
+test_input = parse_input(TEST_INPUT)
 info("=" * 40)
-# info(f"test 1: {part1(test_input)}")
-# info(f"part 1: {part1(input)}")
+info(f"test 1: {part1(test_input)}")
+info(f"part 1: {part1(input)}")
 input = parse_input(stdin)
 test_input = parse_input(TEST_INPUT)
 info(f"test 2: {part2(test_input)}")
-# info(f"part 2: {part2(input)}")
+info(f"part 2: {part2(input)}")
